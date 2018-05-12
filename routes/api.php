@@ -41,3 +41,12 @@ Route::get('restaurants', 'RestaurantAPIController@index');
 Route::post('restaurants/store', 'RestaurantAPIController@store');
 Route::put('restaurants/update', 'RestaurantAPIController@update');
 Route::delete('restaurants/destroy', 'RestaurantAPIController@destroy');
+Route::post('restaurants/createpost', 'RestaurantAPIController@createpost');
+Route::put('restaurants/updatepost', 'RestaurantAPIController@updatepost');
+Route::delete('restaurants/deletepost', 'RestaurantAPIController@deletepost');
+Route::get('restaurants/getposts', 'RestaurantAPIController@getposts');
+Route::get('restaurants/getrestaurants', 'RestaurantAPIController@getrestaurants');
+
+Route::post('posts/createcomment', 'PostAPIController@createcomment');
+Route::put('posts/updatecomment', 'PostAPIController@updatecomment');
+Route::delete('posts/deletecomment', 'PostAPIController@deletecomment');

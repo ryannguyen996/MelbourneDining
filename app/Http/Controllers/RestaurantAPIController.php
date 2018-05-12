@@ -94,4 +94,44 @@ class RestaurantAPIController extends Controller
 		$restaurants->delete();
 		return response()->json(null, 204);
 	}
+
+	public function createpost(Request $request)
+	{
+		$restaurants = restaurants::find($request['id']);
+		$posts = $restaurants->post()->create($request->all());
+		return response()->json($posts, 201);
+	}
+
+	public function updatepost(Request $request)
+	{
+		$restaurants = restaurants::find($request['id']);
+		$restaurants->post->find($request['postid'])->update($request->all());
+		return response()->json($restaurants->post->find($request['postid']), 201);
+	}
+
+	public function deletepost(Request $request)
+	{
+		$restaurants = restaurants::find($request['id']);
+		$restaurants->post->find($request['postid'])->delete();
+		return response()->json(null, 204);
+	}
+
+	public function getposts(Request $request)
+	{
+		$restaurants = restaurants::find($request['id']);
+		$return = $restaurants->post->all();
+		foreach ($return as $value) {
+			response()->json($value);
+			response()->json($value->comment->all());
+		}
+		return $restaurants;
+	}
+
+	public function getrestaurants(Request $request)
+	{
+		$restaurants = restaurants::where([
+			['country_id', '=', $request['country_id']],
+			['category_id', '=', $request['category_id']] ])->get();
+		return response()->json($restaurants, 200);
+	}
 }
