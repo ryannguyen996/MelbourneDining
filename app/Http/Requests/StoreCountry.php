@@ -33,4 +33,8 @@ class StoreCountry extends FormRequest
             'name.required' => 'Please enter the Country name.',
         ];
     }
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $this->validator = $validator;
+    }
 }
