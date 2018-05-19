@@ -19,4 +19,57 @@ class countries extends Model
     {
         return $this->hasMany('App\users', 'country_id', 'id');
     }
+
+    protected static function boot() {
+        parent::boot();
+
+        static::deleting(function($countries) { // before delete() method call this
+            foreach($countries->restaurant as $value) {
+                foreach($value->post as $value)
+                {
+                    foreach($value->comment as $value)
+                    {
+                        $value->delete();
+                    }
+                }
+
+            }
+            foreach($countries->restaurant as $value) {
+                foreach($value->post as $value)
+                {
+                    $value->delete();
+                }
+
+            }
+            foreach($countries->restaurant as $value) {
+                    $value->delete();
+            }
+
+            foreach($countries->user() as $value) {
+                foreach($value->post as $value)
+                {
+
+                    $value->delete();
+                }
+            }
+
+            foreach($countries->user as $value) {
+                foreach($value->comment as $value)
+                {
+
+                    $value->delete();
+                }
+            }
+
+            foreach($countries->user as $value) {
+                $value->role()->detach();
+            }
+
+            foreach($countries->user as $value) {
+                    $value->delete();
+            }
+             // do the rest of the cleanup...
+        });
+    }
+
 }
