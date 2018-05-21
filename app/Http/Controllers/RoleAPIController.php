@@ -11,6 +11,7 @@ use Validator;
 use Input;
 use Session;
 use Redirect;
+use App\Http\Requests\StoreRole;
 
 class RoleAPIController extends Controller
 {
@@ -40,10 +41,15 @@ class RoleAPIController extends Controller
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(StoreRole $request)
 	{
-		$roles = roles::create($request->all());
-		return response()->json($roles, 201);
+		if (isset($request->validator) && $request->validator->fails()){
+            return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+				$roles = roles::create($request->all());
+				return response()->json($roles, 201);
+		}
 	}
 
 	/**
@@ -75,11 +81,23 @@ class RoleAPIController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request)
+	public function update(StoreRole $request)
 	{
+		$id = $request->input('id');
 		$roles = roles::find($request['id']);
-		$roles->update($request->all());
-		return response()->json($roles, 201);
+		if (!isset($roles))
+        {
+            return response()->json(['message'=>'Cannot find Role ID '.$id.' .Please enter Role ID again.'], 400);
+        }
+        else{
+            if (isset($request->validator) && $request->validator->fails()){
+                return response()->json($request->validator->getMessageBag(), 400);
+            }
+				else{
+						$roles->update($request->all());
+						return response()->json($roles, 201);
+					}
+		}
 	}
 
 	/**
@@ -90,8 +108,15 @@ class RoleAPIController extends Controller
 	 */
 	public function destroy(Request $request)
 	{
+		$id = $request->input('id');
 		$roles = roles::find($request['id']);
-		$roles->delete();
-		return response()->json(null, 204);
+		if (!isset($roles))
+            {
+                return response()->json(['message'=>'Cannot find Role ID '.$id.' .Please enter Role ID again.'], 400);
+            }
+            else{
+								$roles->delete();
+								return response()->json(null, 204);
+		}
 	}
 }

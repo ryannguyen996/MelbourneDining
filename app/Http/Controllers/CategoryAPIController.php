@@ -11,6 +11,7 @@ use Validator;
 use Input;
 use Session;
 use Redirect;
+use App\Http\Requests\StoreCategory;
 
 class CategoryAPIController extends Controller
 {
@@ -40,10 +41,15 @@ class CategoryAPIController extends Controller
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(StoreCategory $request)
 	{
-		$categories = categories::create($request->all());
-		return response()->json($categories, 201);
+		if (isset($request->validator) && $request->validator->fails()){
+            return response()->json($request->validator->getMessageBag(), 400);
+        }
+        else{
+					$categories = categories::create($request->all());
+					return response()->json($categories, 201);
+				}
 	}
 
 	/**
@@ -75,13 +81,24 @@ class CategoryAPIController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request)
+	public function update(StoreCategory $request)
 	{
+		$id = $request->input('id');
 		$categories = categories::find($request['id']);
-		$categories->update($request->all());
-		return response()->json($categories, 201);
+		if (!isset($categories))
+        {
+            return response()->json(['message'=>'Cannot find Category ID '.$id.' .Please enter Category ID again.'], 400);
+        }
+		else{
+		       if (isset($request->validator) && $request->validator->fails()){
+		       return response()->json($request->validator->getMessageBag(), 400);
+		     }
+				 else{
+						$categories->update($request->all());
+						return response()->json($categories, 201);
+		}
 	}
-
+}
 	/**
 	 * Remove the specified resource from storage.
 	 *
@@ -90,8 +107,15 @@ class CategoryAPIController extends Controller
 	 */
 	public function destroy(Request $request)
 	{
+		$id = $request->input('id');
 		$categories = categories::find($request['id']);
-		$categories->delete();
-		return response()->json(null, 204);
+		if (!isset($categories))
+            {
+                return response()->json(['message'=>'Cannot find Category ID '.$id.' .Please enter Category ID again.'], 400);
+            }
+				else{
+					$categories->delete();
+					return response()->json(null, 204);
+					}
 	}
 }

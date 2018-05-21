@@ -11,6 +11,7 @@ use Validator;
 use Input;
 use Session;
 use Redirect;
+use App\Http\Requests\StoreUser;
 
 class UserAPIController extends Controller
 {
@@ -40,10 +41,15 @@ class UserAPIController extends Controller
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(StoreUser $request)
 	{
-		$users = users::create($request->all());
-		return response()->json($users, 201);
+		if (isset($request->validator) && $request->validator->fails()){
+            return response()->json($request->validator->getMessageBag(), 400);
+        }
+        else{
+						$users = users::create($request->all());
+						return response()->json($users, 201);
+				}
 	}
 
 	/**
@@ -75,11 +81,23 @@ class UserAPIController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request)
+	public function update(StoreUser $request)
 	{
+		$id = $request->input('id');
 		$users = users::find($request['id']);
-		$users->update($request->all());
-		return response()->json($users, 201);
+		if (!isset($users))
+        {
+            return response()->json(['message'=>'Cannot find User ID '.$id.' .Please enter User ID again.'], 400);
+        }
+        else{
+            if (isset($request->validator) && $request->validator->fails()){
+                return response()->json($request->validator->getMessageBag(), 400);
+            }
+            else{
+							$users->update($request->all());
+							return response()->json($users, 201);
+							}
+							}
 	}
 
 	/**
@@ -90,8 +108,15 @@ class UserAPIController extends Controller
 	 */
 	public function destroy(Request $request)
 	{
+		$id = $request->input('id');
 		$users = users::find($request['id']);
-		$users->delete();
-		return response()->json(null, 204);
+		if (!isset($users))
+            {
+                return response()->json(['message'=>'Cannot find User ID '.$id.' .Please enter User ID again.'], 400);
+            }
+      else{
+					$users->delete();
+					return response()->json(null, 204);
+		}
 	}
 }

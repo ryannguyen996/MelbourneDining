@@ -11,6 +11,9 @@ use Validator;
 use Input;
 use Session;
 use Redirect;
+use App\Http\Requests\StoreRestaurant;
+use App\Http\Requests\StorePost;
+use App\posts;
 
 class RestaurantAPIController extends Controller
 {
@@ -40,10 +43,15 @@ class RestaurantAPIController extends Controller
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(StoreRestaurant $request)
 	{
-		$restaurants = restaurants::create($request->all());
-		return response()->json($restaurants, 201);
+		if (isset($request->validator) && $request->validator->fails()){
+          return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+				$restaurants = restaurants::create($request->all());
+				return response()->json($restaurants, 201);
+		}
 	}
 
 	/**
@@ -75,11 +83,23 @@ class RestaurantAPIController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request)
+	public function update(StoreRestaurant $request)
 	{
+		$id = $request->input('id');
 		$restaurants = restaurants::find($request['id']);
-		$restaurants->update($request->all());
-		return response()->json($restaurants, 201);
+		if (!isset($restaurants))
+        {
+            return response()->json(['message'=>'Cannot find Restaurant ID '.$id.' .Please enter Restaurant ID again.'], 400);
+        }
+		else{
+          if (isset($request->validator) && $request->validator->fails()){
+              return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+				$restaurants->update($request->all());
+				return response()->json($restaurants, 201);
+		}
+		}
 	}
 
 	/**
@@ -90,33 +110,65 @@ class RestaurantAPIController extends Controller
 	 */
 	public function destroy(Request $request)
 	{
+		$id = $request->input('id');
 		$restaurants = restaurants::find($request['id']);
-		$restaurants->delete();
-		return response()->json(null, 204);
+		if (!isset($restaurants))
+            {
+                return response()->json(['message'=>'Cannot find Restaurant ID '.$id.' .Please enter Restaurant ID again.'], 400);
+            }
+		else{
+					$restaurants->delete();
+					return response()->json(null, 204);
+		}
 	}
 
-	public function createpost(Request $request)
+	public function createpost(StorePost $request)
 	{
-		$restaurants = restaurants::find($request['id']);
+		if (isset($request->validator) && $request->validator->fails()){
+          return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+		$restaurants = restaurants::find($request['restaurant_id']);
 		$posts = $restaurants->post()->create($request->all());
 		return response()->json($posts, 201);
-	}
+}
+}
 
-	public function updatepost(Request $request)
+	public function updatepost(StorePost $request)
 	{
-		$restaurants = restaurants::find($request['id']);
+		if (isset($request->validator) && $request->validator->fails()){
+          return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+		$restaurants = restaurants::find($request['restaurant_id']);
 		$restaurants->post->find($request['postid'])->update($request->all());
 		return response()->json($restaurants->post->find($request['postid']), 201);
 	}
+	}
 
-	public function deletepost(Request $request)
+	public function deletepost(StoreRestaurant $request)
 	{
+		$id = $request->input('id');
+		$post = posts::find($request['postid']);
+		$id2 = $request->input('postid');
 		$restaurants = restaurants::find($request['id']);
+		if (!isset($restaurants))
+            {
+                return response()->json(['message'=>'Cannot find Restaurant ID '.$id.' .Please enter Restaurant ID again.'], 400);
+            }
+		else{
+			if (!isset($post))
+	            {
+	                return response()->json(['message'=>'Cannot find Post ID'.$id2.' .Please enter Post ID again.'], 400);
+	            }
+			else{
 		$restaurants->post->find($request['postid'])->delete();
 		return response()->json(null, 204);
 	}
+	}
+	}
 
-	public function getposts(Request $request)
+	public function getposts(StoreRestaurant $request)
 	{
 		$restaurants = restaurants::find($request['id']);
 		$return = $restaurants->post->all();
@@ -127,7 +179,7 @@ class RestaurantAPIController extends Controller
 		return $restaurants;
 	}
 
-	public function getrestaurants(Request $request)
+	public function getrestaurants(StoreRestaurant $request)
 	{
 		$restaurants = restaurants::where([
 			['country_id', '=', $request['country_id']],

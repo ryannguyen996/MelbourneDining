@@ -46,4 +46,8 @@ class StoreRestaurant extends FormRequest
             'category_id.required' => 'Please enter the Restaurant category ID.',
         ];
     }
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $this->validator = $validator;
+    }
 }

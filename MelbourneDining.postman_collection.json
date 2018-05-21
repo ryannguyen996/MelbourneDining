@@ -1175,6 +1175,10 @@
 								{
 									"key": "country_id",
 									"value": "1"
+								},
+								{
+									"key": "category_id",
+									"value": "1"
 								}
 							]
 						}

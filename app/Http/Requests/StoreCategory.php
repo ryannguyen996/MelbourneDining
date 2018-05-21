@@ -30,7 +30,11 @@ class StoreCategory extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Please enter the Comment name.',
+            'name.required' => 'Please enter the Category name.',
         ];
+    }
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $this->validator = $validator;
     }
 }

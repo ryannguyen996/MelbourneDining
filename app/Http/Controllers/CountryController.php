@@ -59,8 +59,7 @@ class CountryController extends Controller
             $countries->name = Input::get('name');
             $countries->save();
             // redirect
-            Session::flash('message', 'Successfully created
-            country !');
+            Session::flash('message', 'Successfully created country !');
             return Redirect::to('countries');
     }
 

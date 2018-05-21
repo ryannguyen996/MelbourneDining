@@ -84,10 +84,11 @@ class CountryAPIController extends Controller
      */
     public function update(StoreCountry $request)
     {
+      $id = $request->input('id');
         $country = countries::find($request['id']);
         if (!isset($country))
         {
-            return response()->json(['message'=>'Id not found'], 400);
+            return response()->json(['message'=>'Cannot find Country ID '.$id.' .Please enter Country ID again.'], 400);
         }
         else{
             if (isset($request->validator) && $request->validator->fails()){
@@ -108,10 +109,11 @@ class CountryAPIController extends Controller
      */
     public function destroy(Request $request)
     {
+      $id = $request->input('id');
         $country = countries::find($request['id']);
         if (!isset($country))
         {
-            return response()->json(['message'=>'Id not found'], 400);
+            return response()->json(['message'=>'Cannot find Country ID '.$id.' .Please enter Country ID again.'], 400);
         }
         else{
             $country->delete();

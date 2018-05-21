@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\posts;
+use App\comments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
@@ -11,6 +12,8 @@ use Validator;
 use Input;
 use Session;
 use Redirect;
+use App\Http\Requests\StorePost;
+use App\Http\Requests\StoreComment;
 
 class PostAPIController extends Controller
 {
@@ -35,10 +38,15 @@ class PostAPIController extends Controller
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(StorePost $request)
 	{
-		$posts = posts::create($request->all());
-		return response()->json($posts, 201);
+		if (isset($request->validator) && $request->validator->fails()){
+            return response()->json($request->validator->getMessageBag(), 400);
+        }
+			else{
+				$posts = posts::create($request->all());
+				return response()->json($posts, 201);
+				}
 	}
 
 	/**
@@ -70,12 +78,24 @@ class PostAPIController extends Controller
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request)
+	public function update(StorePost $request)
 	{
+		$id = $request->input('id');
 		$posts = posts::find($request['id']);
-		$posts->update($request->all());
-		return response()->json($posts, 201);
+		if (!isset($posts))
+        {
+            return response()->json(['message'=>'Cannot find Post ID '.$id.' .Please enter Post ID again.'], 400);
+        }
+		else{
+          if (isset($request->validator) && $request->validator->fails()){
+              return response()->json($request->validator->getMessageBag(), 400);
+          }
+		else{
+				$posts->update($request->all());
+				return response()->json($posts, 201);
+		}
 	}
+}
 
 	/**
 	 * Remove the specified resource from storage.
@@ -85,29 +105,62 @@ class PostAPIController extends Controller
 	 */
 	public function destroy(Request $request)
 	{
+		$id = $request->input('id');
 		$posts = posts::find($request['id']);
-		$posts->delete();
-		return response()->json(null, 204);
+		if (!isset($posts))
+        {
+            return response()->json(['message'=>'Cannot find Post ID '.$id.' .Please enter Post ID again.'], 400);
+        }
+		else{
+				$posts->delete();
+				return response()->json(null, 204);
+		}
 	}
 
-	public function createcomment(Request $request)
+	public function createcomment(StoreComment $request)
 	{
-		$posts = posts::find($request['id']);
+		if (isset($request->validator) && $request->validator->fails()){
+          return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+		$posts = posts::find($request['post_id']);
 		$comments = $posts->comment()->create($request->all());
 		return response()->json($comments, 201);
 	}
+	}
 
-	public function updatecomment(Request $request)
+	public function updatecomment(StoreComment $request)
 	{
-		$posts = posts::find($request['id']);
+		if (isset($request->validator) && $request->validator->fails()){
+          return response()->json($request->validator->getMessageBag(), 400);
+        }
+		else{
+		$posts = posts::find($request['post_id']);
 		$posts->comment->find($request['commentid'])->update($request->all());
 		return response()->json($posts->comment->find($request['commentid']), 201);
 	}
+	}
 
-	public function deletecomment(Request $request)
+	public function deletecomment(StorePost $request)
 	{
 		$posts = posts::find($request['id']);
+		$id = $request->input('id');
+		$comments = comments::find($request['commentid']);
+		$id2 = $request->input('commentid');
+		if (!isset($posts))
+            {
+                return response()->json(['message'=>'Cannot find Post ID '.$id.' .Please enter Post ID again.'], 400);
+            }
+		else{
+			if (!isset($comments))
+	            {
+	                return response()->json(['message'=>'Cannot find Comment ID '.$id2.' .Please enter Comment ID again.'], 400);
+	            }
+			else{
 		$posts->comment->find($request['commentid'])->delete();
 		return response()->json(null, 204);
+
 	}
+}
+}
 }

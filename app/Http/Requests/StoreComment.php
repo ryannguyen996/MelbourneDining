@@ -37,4 +37,8 @@ class StoreComment extends FormRequest
             'user_id.required' => 'Please enter the User ID.',
         ];
     }
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $this->validator = $validator;
+    }
 }

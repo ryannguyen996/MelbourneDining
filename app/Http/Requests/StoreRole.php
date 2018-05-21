@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePost extends FormRequest
+class StoreRole extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,17 +24,13 @@ class StorePost extends FormRequest
     public function rules()
     {
         return [
-            'content' => 'required',
-            'restaurant_id' => 'required|numeric',
-            'user_id' => 'required|numeric',
+            'name' => 'required',
         ];
     }
     public function messages()
     {
         return [
-            'content.required' => 'Please enter the Post content.',
-            'restaurant_id.required' => 'Please enter the Restaurant ID.',
-            'user_id.required' => 'Please enter the User ID.',
+            'name.required' => 'Please enter the Role name.',
         ];
     }
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)

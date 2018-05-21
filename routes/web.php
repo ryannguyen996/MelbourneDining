@@ -42,4 +42,3 @@ Route::resource('restaurants', 'RestaurantController');
 Route::resource('roles', 'RoleController');
 Route::resource('users', 'UserController');
 Route::get('restaurantwithdetails/{id}','RestaurantController@restaurantwithdetails');
-
